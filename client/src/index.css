@@ -1,0 +1,100 @@
+/* client/src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+:root {
+  --primary-blue: #007bff; /* Azul padrão, pode ser o azul da Paramount+ como #0095da ou #0073ff */
+  --paramount-blue: #0073ff; /* Um exemplo de azul mais próximo ao da Paramount */
+  --dark-bg: #101012; /* Fundo escuro principal, similar a muitas plataformas */
+  --dark-bg-secondary: #1A1C20; /* Um tom um pouco mais claro para elementos secundários */
+  --text-light: #f0f2f5; /* Texto claro principal */
+  --text-muted: #a8b3cf; /* Texto claro secundário/silenciado */
+  --border-color: #2c2f39;
+  --font-sans: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--dark-bg);
+  color: var(--text-light);
+  line-height: 1.5;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: var(--paramount-blue);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-weight: 700; /* Mais forte por padrão */
+  line-height: 1.2;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.1s ease;
+}
+
+button:hover {
+  opacity: 0.85;
+}
+button:active {
+  transform: scale(0.98);
+}
+
+
+.container { /* Classe que usamos no App.jsx */
+  flex-grow: 1;
+  padding-left: 20px;
+  padding-right: 20px;
+  width: 100%;
+  max-width: 1300px; /* Mais largo para layout de streaming */
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Estilos para input e botões dos formulários (para consistência) */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  padding: 14px 18px; /* Mais padding */
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  background-color: var(--dark-bg-secondary);
+  color: var(--text-light);
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 15px; /* Espaçamento padrão */
+  outline: none; /* Remover outline padrão */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+  border-color: var(--paramount-blue);
+  box-shadow: 0 0 0 3px rgba(0, 115, 255, 0.25); /* Usando o azul da paramount */
+}
+
+/* Para placeholder com cor customizada */
+input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.7;
+}

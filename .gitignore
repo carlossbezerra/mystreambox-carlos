@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Build output
+client/dist/
+
+# Environment variables
+.env
+client/.env
+server/.env
+
+# SQLite database file (se você não quiser versioná-lo)
+server/dev.sqlite 
+# server/*.sqlite # Mais genérico se o nome mudar
+# server/database/ # Se você colocar o sqlite numa subpasta
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# IDE/Editor specific
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS generated files
+.DS_Store
+Thumbs.db
