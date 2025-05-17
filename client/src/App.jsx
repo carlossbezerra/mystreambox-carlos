@@ -1,35 +1,113 @@
 // client/src/App.jsx
-import React from 'react';
+import React, { useState, useEffect } from 'react'; // Adicionado useState e useEffect
 import { Routes, Route, Navigate, Link } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-// HomePage será nossa LandingPage por enquanto
-import HomePage from './pages/HomePage'; 
+import HomePage from './pages/HomePage'; // Esta é a nossa LandingPage pública
+import ContentCarousel from './components/ContentCarousel'; // Importar o carrossel
+import TrailerModal from './components/TrailerModal';     // Importar o modal do trailer
 import { useAuth } from './context/AuthContext';
+import axios from 'axios'; // Necessário para chamadas API aqui
+
+// URL base da API de conteúdo (pode vir de um arquivo de config ou .env)
+const API_CONTENT_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+
 
 // Componente para a Página Inicial quando o usuário está LOGADO
-function LoggedInContent() {
+// Renomeado para HomePageLoggedIn para mais clareza
+function HomePageLoggedIn() {
   const { currentUser } = useAuth();
+  const [featuredItems, setFeaturedItems] = useState([]);
+  const [newsItems, setNewsItems] = useState([]);
+  const [actionItems, setActionItems] = useState([]); // Exemplo de outra categoria
+  const [isLoadingContent, setIsLoadingContent] = useState(true);
+  const [errorContent, setErrorContent] = useState('');
+
+  const [selectedTrailer, setSelectedTrailer] = useState(null); // { url, title }
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      setIsLoadingContent(true);
+      setErrorContent('');
+      try {
+        // Buscar conteúdo para cada categoria
+        // Certifique-se que os slugs 'em-destaque', 'novidades', 'acao' existem no seu DB
+        const featuredResponse = await axios.get(`${API_CONTENT_URL}/content/category/em-destaque`);
+        setFeaturedItems(featuredResponse.data.items || []);
+
+        const newsResponse = await axios.get(`${API_CONTENT_URL}/content/category/novidades`);
+        setNewsItems(newsResponse.data.items || []);
+        
+        const actionResponse = await axios.get(`${API_CONTENT_URL}/content/category/acao`);
+        setActionItems(actionResponse.data.items || []);
+
+      } catch (err) {
+        console.error("Erro ao buscar conteúdo:", err);
+        setErrorContent('Não foi possível carregar o conteúdo. Tente novamente mais tarde.');
+      }
+      setIsLoadingContent(false);
+    };
+
+    if (currentUser) { // Só busca conteúdo se o usuário estiver logado
+        fetchContent();
+    } else {
+        setIsLoadingContent(false); // Se não há usuário, não há o que carregar
+    }
+  }, [currentUser]); // Dependência no currentUser para re-buscar se o usuário mudar (ou ao logar)
+
+  const handleCardClick = (item) => {
+    if (item && item.trailerUrl) {
+        let embedUrl = item.trailerUrl;
+        if (embedUrl.includes("watch?v=")) {
+            embedUrl = embedUrl.replace("watch?v=", "embed/");
+        }
+        const videoIdMatch = embedUrl.match(/embed\/([^&?#]+)/);
+        if (videoIdMatch && videoIdMatch[1]) {
+            embedUrl = `https://www.youtube.com/embed/${videoIdMatch[1]}`;
+        }
+        setSelectedTrailer({ url: embedUrl, title: item.title });
+    } else {
+        alert("Trailer indisponível para este item.");
+    }
+  };
+
+  const closeTrailerModal = () => {
+    setSelectedTrailer(null);
+  };
+
+  const pageStyle = { 
+    padding: '20px', 
+    textAlign: 'left',
+    color: 'var(--text-light)' 
+  };
+
+  if (isLoadingContent) {
+    return <div style={{...pageStyle, textAlign: 'center', fontSize: '1.2rem', marginTop: '50px'}}>Carregando conteúdo...</div>;
+  }
+
+  if (errorContent) {
+    return <div style={{...pageStyle, textAlign: 'center', color: '#ff4d4f', marginTop: '50px'}}>{errorContent}</div>;
+  }
+
   return (
-    <div style={{ 
-        padding: '20px', 
-        textAlign: 'left',
-        color: 'var(--text-light)' 
-    }}>
-      <h1 style={{ fontSize: '2.2rem', marginBottom: '20px', fontWeight: '700' }}>
+    <div style={pageStyle}>
+      <h1 style={{ fontSize: '2.2rem', marginBottom: '30px', fontWeight: '700' }}>
         Bem-vindo à MyStreamBox, {currentUser?.name || currentUser?.email}!
       </h1>
-      <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '30px' }}>
-        Explore nossa montanha de entretenimento.
-      </p>
-      <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '30px' }}>
-        <h2 style={{ fontSize: '1.75rem', marginBottom: '20px', color: 'var(--text-light)' }}>Em Destaque</h2>
-        <p style={{ color: 'var(--text-muted)' }}>(Carrossel de filmes em destaque viria aqui)</p>
-        
-        <h2 style={{ fontSize: '1.75rem', marginTop: '40px', marginBottom: '20px', color: 'var(--text-light)' }}>Novidades</h2>
-        <p style={{ color: 'var(--text-muted)' }}>(Carrossel de novidades viria aqui)</p>
-      </div>
+
+      <ContentCarousel title="Em Destaque" items={featuredItems} onCardClick={handleCardClick} />
+      <ContentCarousel title="Novidades" items={newsItems} onCardClick={handleCardClick} />
+      <ContentCarousel title="Ação" items={actionItems} onCardClick={handleCardClick} />
+      {/* Adicione mais carrosséis para outras categorias conforme necessário */}
+
+      {selectedTrailer && (
+        <TrailerModal 
+            trailerUrl={selectedTrailer.url} 
+            title={selectedTrailer.title} 
+            onClose={closeTrailerModal} 
+        />
+      )}
     </div>
   );
 }
@@ -38,8 +116,8 @@ function LoggedInContent() {
 function ProtectedRoute({ children }) {
   const { currentUser, loading } = useAuth();
 
-  if (loading) { // Mostra um loader enquanto o estado de auth é verificado
-    return <div style={{ textAlign: 'center', marginTop: '100px', fontSize: '1.2rem' }}>Carregando...</div>;
+  if (loading) {
+    return <div style={{ textAlign: 'center', marginTop: '100px', fontSize: '1.2rem', color: 'var(--text-light)' }}>Carregando autenticação...</div>;
   }
 
   if (!currentUser) {
@@ -55,12 +133,11 @@ function App() {
   return (
     <>
       <Navbar />
-      {/* paddingTop deve ser igual ou maior que a altura do Navbar */}
-      <main className="container" style={{ paddingTop: '85px' /* 65px navbar + 20px margem */ }}>
+      <main className="container" style={{ paddingTop: '85px' }}>
         <Routes>
           <Route 
             path="/" 
-            element={currentUser ? <LoggedInContent /> : <HomePage />} /* HomePage serve como LandingPage */
+            element={currentUser ? <HomePageLoggedIn /> : <HomePage />} /* HomePage é a LandingPage */
           />
           <Route 
             path="/login" 
@@ -71,12 +148,14 @@ function App() {
             element={currentUser ? <Navigate to="/" replace /> : <RegisterPage />} 
           />
           
-          {/* Exemplo de rota protegida para uma futura página de filmes */}
           <Route 
-            path="/movies"
+            path="/movies" // Exemplo de rota protegida
             element={
               <ProtectedRoute>
-                <div style={{color: 'var(--text-light)'}}><h1>Página de Filmes (Protegida)</h1><p>Conteúdo exclusivo para assinantes.</p></div>
+                <div style={{color: 'var(--text-light)', padding: '20px'}}>
+                  <h1>Página de Filmes (Protegida)</h1>
+                  <p>Aqui listaria todos os filmes para usuários logados.</p>
+                </div>
               </ProtectedRoute>
             } 
           />

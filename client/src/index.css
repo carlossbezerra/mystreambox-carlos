@@ -98,3 +98,12 @@ input::placeholder {
   color: var(--text-muted);
   opacity: 0.7;
 }
+
+.scrollable-row::-webkit-scrollbar {
+  display: none; /* Para Chrome, Safari, Edge */
+}
+
+.scrollable-row {
+  -ms-overflow-style: none;  /* IE e Edge legado */
+  scrollbar-width: none;  /* Firefox */
+}

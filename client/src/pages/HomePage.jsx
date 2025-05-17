@@ -1,12 +1,8 @@
 // client/src/pages/HomePage.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
-// useAuth não é necessário aqui se for apenas a landing page pública
-// import { useAuth } from '../context/AuthContext';
 
 function HomePage() {
-    // const { currentUser } = useAuth(); // Não precisamos mais disso aqui
-
     const containerStyle = {
         display: 'flex',
         flexDirection: 'column',
@@ -17,26 +13,26 @@ function HomePage() {
         padding: '40px 20px',
         fontFamily: 'var(--font-sans)',
         color: 'var(--text-light)',
-        // Para um efeito de fundo com imagem e gradiente (substitua pela sua imagem)
-        // Se for usar imagem, coloque-a na pasta `public` e referencie como url('/nome-da-imagem.jpg')
-        // backgroundImage: 'linear-gradient(to bottom, rgba(16, 16, 18, 0.7) 0%, rgba(16, 16, 18, 1) 100%), url("/hero-background.jpg")',
-        // backgroundSize: 'cover',
-        // backgroundPosition: 'center center',
+        // Imagem de fundo com gradiente sobreposto
+        backgroundImage: 'linear-gradient(to bottom, rgba(16, 16, 18, 0.6) 0%, rgba(16, 16, 18, 0.9) 70%, var(--dark-bg) 100%), url("/hero-background.jpg")', // Substitua hero-background.jpg pelo nome da sua imagem
+        backgroundSize: 'cover',
+        backgroundPosition: 'center center',
+        backgroundRepeat: 'no-repeat',
     };
 
     const titleStyle = {
-        fontSize: 'clamp(2.8rem, 7vw, 4.8rem)',
-        fontWeight: '900', // Mais pesado
+        fontSize: 'clamp(2.8rem, 7vw, 4.2rem)', // Ajustado
+        fontWeight: '900',
         marginBottom: '1.5rem',
         color: 'white',
-        textShadow: '0px 3px 6px rgba(0,0,0,0.7)',
-        letterSpacing: '-1px',
+        textShadow: '0px 4px 8px rgba(0,0,0,0.7)', // Sombra mais pronunciada
+        maxWidth: '800px', // Para quebrar linha se for muito grande
     };
 
     const subtitleStyle = {
-        fontSize: 'clamp(1.1rem, 3vw, 1.35rem)',
+        fontSize: 'clamp(1.1rem, 3vw, 1.25rem)',
         marginBottom: '3rem',
-        maxWidth: '650px',
+        maxWidth: '600px',
         lineHeight: '1.7',
         color: 'var(--text-muted)',
     };
@@ -51,7 +47,7 @@ function HomePage() {
     
     const buttonBaseStyle = {
         padding: '18px 22px',
-        fontSize: '1.15rem',
+        fontSize: '1.1rem', // Reduzido um pouco
         fontWeight: 'bold',
         borderRadius: '4px',
         textDecoration: 'none',
@@ -60,34 +56,33 @@ function HomePage() {
         textTransform: 'uppercase',
         border: 'none',
         letterSpacing: '0.5px',
+        display: 'block', // Para que o Link ocupe a largura
     };
 
     const primaryButtonStyle = {
         ...buttonBaseStyle,
         color: 'white',
-        backgroundColor: 'var(--paramount-blue)',
-        boxShadow: '0 4px 10px rgba(0, 115, 255, 0.3)',
+        backgroundColor: 'var(--paramount-blue)', // Usando a variável de cor
+        boxShadow: '0 4px 12px rgba(0, 115, 255, 0.35)',
     };
 
     const secondaryButtonStyle = {
         ...buttonBaseStyle,
         color: 'var(--text-light)',
-        backgroundColor: 'rgba(255, 255, 255, 0.08)',
-        border: '2px solid rgba(255, 255, 255, 0.3)',
+        backgroundColor: 'rgba(255, 255, 255, 0.05)', // Fundo mais sutil
+        border: '2px solid rgba(255, 255, 255, 0.2)', // Borda sutil
     };
     
-    // Simples hover com JS (CSS Modules ou classes são melhores para isso)
     const handleMouseEnter = (e, isPrimary) => {
         e.currentTarget.style.transform = 'translateY(-2px)';
-        if(isPrimary) e.currentTarget.style.boxShadow = '0 6px 12px rgba(0, 115, 255, 0.4)';
-        else e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.15)';
+        if(isPrimary) e.currentTarget.style.boxShadow = '0 6px 15px rgba(0, 115, 255, 0.45)';
+        else e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
     };
     const handleMouseLeave = (e, isPrimary) => {
         e.currentTarget.style.transform = 'translateY(0px)';
-         if(isPrimary) e.currentTarget.style.boxShadow = '0 4px 10px rgba(0, 115, 255, 0.3)';
-         else e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+        if(isPrimary) e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 115, 255, 0.35)';
+        else e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
     };
-
 
     return (
         <div style={containerStyle}>
