@@ -13,13 +13,13 @@ const Category = sequelize.define('Category', {
         allowNull: false,
         unique: true,
     },
-    slug: { // Para URLs amigáveis, ex: 'em-destaque', 'novidades'
+    slug: { 
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
     }
 }, {
-    timestamps: false, // Geralmente categorias não precisam de timestamps
+    timestamps: false, 
 });
 
 module.exports = Category;

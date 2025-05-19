@@ -1,7 +1,7 @@
 // server/src/models/ContentItem.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const Category = require('./Category'); // Importar Categoria
+const Category = require('./Category'); 
 
 const ContentItem = sequelize.define('ContentItem', {
     id: {
@@ -17,11 +17,11 @@ const ContentItem = sequelize.define('ContentItem', {
         type: DataTypes.TEXT,
         allowNull: true,
     },
-    posterUrl: { // URL para a imagem do pôster
+    posterUrl: { 
         type: DataTypes.STRING,
         allowNull: false,
     },
-    trailerUrl: { // URL do trailer (ex: link do YouTube)
+    trailerUrl: { 
         type: DataTypes.STRING,
         allowNull: false,
     },
@@ -29,11 +29,10 @@ const ContentItem = sequelize.define('ContentItem', {
         type: DataTypes.INTEGER,
         allowNull: true,
     },
-    contentType: { // 'movie' ou 'series'
+    contentType: { 
         type: DataTypes.STRING,
         allowNull: false,
     },
-    // Chave estrangeira para Category
     categoryId: {
         type: DataTypes.INTEGER,
         references: {
@@ -45,7 +44,6 @@ const ContentItem = sequelize.define('ContentItem', {
     timestamps: true,
 });
 
-// Definir a Associação
 Category.hasMany(ContentItem, { foreignKey: 'categoryId' });
 ContentItem.belongsTo(Category, { foreignKey: 'categoryId' });
 

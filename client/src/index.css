@@ -2,12 +2,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
 :root {
-  --primary-blue: #007bff; /* Azul padrão, pode ser o azul da Paramount+ como #0095da ou #0073ff */
-  --paramount-blue: #0073ff; /* Um exemplo de azul mais próximo ao da Paramount */
-  --dark-bg: #101012; /* Fundo escuro principal, similar a muitas plataformas */
-  --dark-bg-secondary: #1A1C20; /* Um tom um pouco mais claro para elementos secundários */
-  --text-light: #f0f2f5; /* Texto claro principal */
-  --text-muted: #a8b3cf; /* Texto claro secundário/silenciado */
+  --primary-blue: #007bff; 
+  --paramount-blue: #0073ff; 
+  --dark-bg: #101012; 
+  --dark-bg-secondary: #1A1C20; 
+  --text-light: #f0f2f5; 
+  --text-muted: #a8b3cf; 
   --border-color: #2c2f39;
   --font-sans: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
@@ -40,7 +40,7 @@ a:hover {
 h1, h2, h3, h4, h5, h6 {
   margin-top: 0;
   margin-bottom: 0.75rem;
-  font-weight: 700; /* Mais forte por padrão */
+  font-weight: 700; 
   line-height: 1.2;
 }
 
@@ -59,21 +59,20 @@ button:active {
 }
 
 
-.container { /* Classe que usamos no App.jsx */
+.container { 
   flex-grow: 1;
   padding-left: 20px;
   padding-right: 20px;
   width: 100%;
-  max-width: 1300px; /* Mais largo para layout de streaming */
+  max-width: 1300px; 
   margin: 0 auto;
   box-sizing: border-box;
 }
 
-/* Estilos para input e botões dos formulários (para consistência) */
 input[type="text"],
 input[type="email"],
 input[type="password"] {
-  padding: 14px 18px; /* Mais padding */
+  padding: 14px 18px; 
   border-radius: 4px;
   border: 1px solid var(--border-color);
   background-color: var(--dark-bg-secondary);
@@ -81,8 +80,8 @@ input[type="password"] {
   font-size: 1rem;
   width: 100%;
   box-sizing: border-box;
-  margin-bottom: 15px; /* Espaçamento padrão */
-  outline: none; /* Remover outline padrão */
+  margin-bottom: 15px; 
+  outline: none; 
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -90,15 +89,15 @@ input[type="text"]:focus,
 input[type="email"]:focus,
 input[type="password"]:focus {
   border-color: var(--paramount-blue);
-  box-shadow: 0 0 0 3px rgba(0, 115, 255, 0.25); /* Usando o azul da paramount */
+  box-shadow: 0 0 0 3px rgba(0, 115, 255, 0.25); 
 }
 
-/* Para placeholder com cor customizada */
 input::placeholder {
   color: var(--text-muted);
   opacity: 0.7;
 }
 
+/* --- Estilos para a barra de rolagem do carrossel (se não estiver usando setas Swiper) --- */
 .scrollable-row::-webkit-scrollbar {
   display: none; /* Para Chrome, Safari, Edge */
 }
@@ -106,4 +105,81 @@ input::placeholder {
 .scrollable-row {
   -ms-overflow-style: none;  /* IE e Edge legado */
   scrollbar-width: none;  /* Firefox */
+}
+
+/* --- Estilos para as setas e paginação do Swiper --- */
+/* Wrapper para o carrossel Swiper, para ajudar no posicionamento das setas se necessário */
+.content-carousel-wrapper {
+    position: relative; /* Importante para posicionar as setas absolutamente dentro dele */
+    /* Adicione padding lateral se quiser que as setas fiquem um pouco para dentro do conteúdo
+       e não nas bordas da tela/container. Por exemplo:
+       padding-left: 40px; 
+       padding-right: 40px;
+       Isso fará com que o Swiper seja um pouco mais estreito que o título.
+    */
+}
+
+/* Estilização das setas de navegação do Swiper */
+.swiper-button-next,
+.swiper-button-prev {
+    color: var(--text-light) !important; /* Cor da seta (ícone) */
+    background-color: rgba(26, 28, 32, 0.6); /* Fundo semi-transparente para as setas */
+    width: 44px !important;  /* Largura do botão da seta */
+    height: 44px !important; /* Altura do botão da seta */
+    border-radius: 50%;     /* Para um botão circular */
+    transition: background-color 0.3s ease, opacity 0.3s ease;
+    opacity: 0.7; /* Começa um pouco transparente */
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+    background-color: rgba(26, 28, 32, 0.9); /* Mais opaco no hover */
+    opacity: 1;
+}
+
+/* Esconder as setas se estiverem desabilitadas (início/fim do carrossel sem loop) */
+.swiper-button-disabled {
+    opacity: 0 !important; /* Esconde completamente */
+    cursor: auto !important;
+    pointer-events: none !important; /* Impede cliques */
+}
+
+/* Estilizar o ícone da seta (::after é o pseudo-elemento que o Swiper usa para o ícone) */
+.swiper-button-next::after,
+.swiper-button-prev::after {
+    font-size: 18px !important; /* Tamanho do ícone da seta */
+    font-weight: bold !important; /* Deixa a seta mais grossa */
+}
+
+/* Ajuste fino da posição das setas (opcional, o Swiper tenta centralizar verticalmente) */
+/* Para movê-las um pouco para fora se você não adicionou padding no .content-carousel-wrapper */
+.swiper-button-prev {
+    left: 5px !important; /* Ajuste conforme necessário */
+}
+.swiper-button-next {
+    right: 5px !important; /* Ajuste conforme necessário */
+}
+
+
+/* Estilização da paginação do Swiper (se você habilitar a opção `pagination` no Swiper) */
+.swiper-pagination {
+    position: absolute; /* Posição padrão, pode ser ajustada */
+    bottom: 0px !important; /* Um pouco acima da borda inferior do carrossel */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    padding-bottom: 5px; /* Para não ficar colado na borda */
+}
+
+.swiper-pagination-bullet {
+    background-color: var(--text-muted) !important; /* Cor do bullet inativo */
+    opacity: 0.5 !important;
+    width: 8px !important;  /* Tamanho dos bullets */
+    height: 8px !important;
+    margin: 0 5px !important; /* Espaçamento entre bullets */
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.swiper-pagination-bullet-active {
+    background-color: var(--paramount-blue) !important; /* Cor do bullet ativo */
+    opacity: 1 !important;
 }

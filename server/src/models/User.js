@@ -26,7 +26,7 @@ const User = sequelize.define('User', {
         allowNull: false,
     },
 }, {
-    timestamps: true, // Adiciona createdAt e updatedAt
+    timestamps: true, 
     hooks: {
         beforeCreate: async (user) => {
             if (user.password) {
@@ -35,7 +35,6 @@ const User = sequelize.define('User', {
             }
         },
         beforeUpdate: async (user) => {
-            // Apenas faz hash se a senha realmente mudou e o campo password foi fornecido
             if (user.changed('password') && user.password) {
                 const salt = await bcrypt.genSalt(10);
                 user.password = await bcrypt.hash(user.password, salt);
@@ -44,10 +43,7 @@ const User = sequelize.define('User', {
     }
 });
 
-// Método para verificar senha
-// CORREÇÃO APLICADA AQUI: Removido o "=:" extra
 User.prototype.isValidPassword = async function(passwordToVerify) {
-    // 'this.password' é a senha hasheada do banco de dados para este usuário
     return await bcrypt.compare(passwordToVerify, this.password);
 };
 

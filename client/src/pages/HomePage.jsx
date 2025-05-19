@@ -14,7 +14,7 @@ function HomePage() {
         fontFamily: 'var(--font-sans)',
         color: 'var(--text-light)',
         // Imagem de fundo com gradiente sobreposto
-        backgroundImage: 'linear-gradient(to bottom, rgba(16, 16, 18, 0.6) 0%, rgba(16, 16, 18, 0.9) 70%, var(--dark-bg) 100%), url("/hero-background.jpg")', // Substitua hero-background.jpg pelo nome da sua imagem
+        backgroundImage: 'linear-gradient(to bottom, rgba(16, 16, 18, 0.6) 0%, rgba(16, 16, 18, 0.9) 70%, var(--dark-bg) 100%), url("/mystreambox.png")', // Substitua hero-background.jpg pelo nome da sua imagem
         backgroundSize: 'cover',
         backgroundPosition: 'center center',
         backgroundRepeat: 'no-repeat',

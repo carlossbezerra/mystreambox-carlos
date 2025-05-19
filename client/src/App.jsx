@@ -1,80 +1,68 @@
 // client/src/App.jsx
-import React, { useState, useEffect } from 'react'; // Adicionado useState e useEffect
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, Link } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import HomePage from './pages/HomePage'; // Esta é a nossa LandingPage pública
-import ContentCarousel from './components/ContentCarousel'; // Importar o carrossel
-import TrailerModal from './components/TrailerModal';     // Importar o modal do trailer
+import HomePage from './pages/HomePage'; 
+import ContentCarousel from './components/ContentCarousel';
+// TrailerModal não é mais importado aqui se ele só é usado em ContentDetailPage
 import { useAuth } from './context/AuthContext';
-import axios from 'axios'; // Necessário para chamadas API aqui
+import axios from 'axios';
+import ContentDetailPage from './pages/ContentDetailPage';
 
-// URL base da API de conteúdo (pode vir de um arquivo de config ou .env)
 const API_CONTENT_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
-
-// Componente para a Página Inicial quando o usuário está LOGADO
-// Renomeado para HomePageLoggedIn para mais clareza
 function HomePageLoggedIn() {
   const { currentUser } = useAuth();
   const [featuredItems, setFeaturedItems] = useState([]);
   const [newsItems, setNewsItems] = useState([]);
-  const [actionItems, setActionItems] = useState([]); // Exemplo de outra categoria
+  const [actionItems, setActionItems] = useState([]);
+  const [dramaItems, setDramaItems] = useState([]);
+  const [comedyItems, setComedyItems] = useState([]);
+  const [terrorItems, setTerrorItems] = useState([]);
+  const [aventuraItems, setAventuraItems] = useState([]);
   const [isLoadingContent, setIsLoadingContent] = useState(true);
   const [errorContent, setErrorContent] = useState('');
-
-  const [selectedTrailer, setSelectedTrailer] = useState(null); // { url, title }
 
   useEffect(() => {
     const fetchContent = async () => {
       setIsLoadingContent(true);
       setErrorContent('');
       try {
-        // Buscar conteúdo para cada categoria
-        // Certifique-se que os slugs 'em-destaque', 'novidades', 'acao' existem no seu DB
-        const featuredResponse = await axios.get(`${API_CONTENT_URL}/content/category/em-destaque`);
-        setFeaturedItems(featuredResponse.data.items || []);
+        const responses = await Promise.all([
+            axios.get(`${API_CONTENT_URL}/content/category/em-destaque`),
+            axios.get(`${API_CONTENT_URL}/content/category/novidades`),
+            axios.get(`${API_CONTENT_URL}/content/category/acao`),
+            axios.get(`${API_CONTENT_URL}/content/category/drama`),
+            axios.get(`${API_CONTENT_URL}/content/category/comedia`),
+            axios.get(`${API_CONTENT_URL}/content/category/terror`),
+            axios.get(`${API_CONTENT_URL}/content/category/aventura`)
+        ]);
 
-        const newsResponse = await axios.get(`${API_CONTENT_URL}/content/category/novidades`);
-        setNewsItems(newsResponse.data.items || []);
-        
-        const actionResponse = await axios.get(`${API_CONTENT_URL}/content/category/acao`);
-        setActionItems(actionResponse.data.items || []);
+        const [featuredRes, newsRes, actionRes, dramaRes, comedyRes, terrorRes, aventuraRes] = responses;
+
+        setFeaturedItems(featuredRes.data.items || []);
+        setNewsItems(newsRes.data.items || []);
+        setActionItems(actionRes.data.items || []);
+        setDramaItems(dramaRes.data.items || []);
+        setComedyItems(comedyRes.data.items || []);
+        setTerrorItems(terrorRes.data.items || []);
+        setAventuraItems(aventuraRes.data.items || []);
 
       } catch (err) {
-        console.error("Erro ao buscar conteúdo:", err);
+        console.error("Erro ao buscar conteúdo:", err.response ? err.response.data : err.message);
         setErrorContent('Não foi possível carregar o conteúdo. Tente novamente mais tarde.');
       }
       setIsLoadingContent(false);
     };
 
-    if (currentUser) { // Só busca conteúdo se o usuário estiver logado
+    if (currentUser) {
         fetchContent();
     } else {
-        setIsLoadingContent(false); // Se não há usuário, não há o que carregar
+        setIsLoadingContent(false);
     }
-  }, [currentUser]); // Dependência no currentUser para re-buscar se o usuário mudar (ou ao logar)
-
-  const handleCardClick = (item) => {
-    if (item && item.trailerUrl) {
-        let embedUrl = item.trailerUrl;
-        if (embedUrl.includes("watch?v=")) {
-            embedUrl = embedUrl.replace("watch?v=", "embed/");
-        }
-        const videoIdMatch = embedUrl.match(/embed\/([^&?#]+)/);
-        if (videoIdMatch && videoIdMatch[1]) {
-            embedUrl = `https://www.youtube.com/embed/${videoIdMatch[1]}`;
-        }
-        setSelectedTrailer({ url: embedUrl, title: item.title });
-    } else {
-        alert("Trailer indisponível para este item.");
-    }
-  };
-
-  const closeTrailerModal = () => {
-    setSelectedTrailer(null);
-  };
+  }, [currentUser]);
 
   const pageStyle = { 
     padding: '20px', 
@@ -82,11 +70,12 @@ function HomePageLoggedIn() {
     color: 'var(--text-light)' 
   };
 
-  if (isLoadingContent) {
+  // CORREÇÃO APLICADA AQUI: Removidos os comentários de dentro das condições
+  if (isLoadingContent) { 
     return <div style={{...pageStyle, textAlign: 'center', fontSize: '1.2rem', marginTop: '50px'}}>Carregando conteúdo...</div>;
   }
 
-  if (errorContent) {
+  if (errorContent) { 
     return <div style={{...pageStyle, textAlign: 'center', color: '#ff4d4f', marginTop: '50px'}}>{errorContent}</div>;
   }
 
@@ -96,23 +85,21 @@ function HomePageLoggedIn() {
         Bem-vindo à MyStreamBox, {currentUser?.name || currentUser?.email}!
       </h1>
 
-      <ContentCarousel title="Em Destaque" items={featuredItems} onCardClick={handleCardClick} />
-      <ContentCarousel title="Novidades" items={newsItems} onCardClick={handleCardClick} />
-      <ContentCarousel title="Ação" items={actionItems} onCardClick={handleCardClick} />
-      {/* Adicione mais carrosséis para outras categorias conforme necessário */}
-
-      {selectedTrailer && (
-        <TrailerModal 
-            trailerUrl={selectedTrailer.url} 
-            title={selectedTrailer.title} 
-            onClose={closeTrailerModal} 
-        />
-      )}
+      <ContentCarousel title="Em Destaque" items={featuredItems} />
+      <ContentCarousel title="Novidades" items={newsItems} />
+      <ContentCarousel title="Ação" items={actionItems} />
+      <ContentCarousel title="Drama" items={dramaItems} />
+      <ContentCarousel title="Comédia" items={comedyItems} />
+      <ContentCarousel title="Terror" items={terrorItems} />
+      <ContentCarousel title="Aventura" items={aventuraItems} />
     </div>
   );
 }
 
-// Componente para Rotas Protegidas
+// ... (Resto do App.jsx: ProtectedRoute, function App(), export default App;) ...
+// Certifique-se que o resto do App.jsx está correto como na nossa última versão funcional dele.
+// Vou incluir o App completo abaixo para garantir.
+
 function ProtectedRoute({ children }) {
   const { currentUser, loading } = useAuth();
 
@@ -126,7 +113,6 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
-
 function App() {
   const { currentUser } = useAuth();
 
@@ -137,7 +123,7 @@ function App() {
         <Routes>
           <Route 
             path="/" 
-            element={currentUser ? <HomePageLoggedIn /> : <HomePage />} /* HomePage é a LandingPage */
+            element={currentUser ? <HomePageLoggedIn /> : <HomePage />} 
           />
           <Route 
             path="/login" 
@@ -147,9 +133,16 @@ function App() {
             path="/register" 
             element={currentUser ? <Navigate to="/" replace /> : <RegisterPage />} 
           />
-          
           <Route 
-            path="/movies" // Exemplo de rota protegida
+            path="/item/:itemId" 
+            element={
+              <ProtectedRoute>
+                <ContentDetailPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/movies"
             element={
               <ProtectedRoute>
                 <div style={{color: 'var(--text-light)', padding: '20px'}}>
@@ -159,7 +152,6 @@ function App() {
               </ProtectedRoute>
             } 
           />
-
           <Route path="*" element={
             <div style={{ textAlign: 'center', marginTop: '50px', color: 'var(--text-light)' }}>
               <h2 style={{fontSize: '2rem'}}>404 - Página Não Encontrada</h2>

@@ -1,15 +1,13 @@
 // server/src/controllers/authController.js
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
-// dotenv já foi carregado em server/server.js, então process.env.JWT_SECRET está disponível
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// Não precisamos da verificação aqui se já fizemos no server.js, mas não prejudica.
+// A verificação do JWT_SECRET já é feita no server.js, mas uma dupla checagem não faz mal.
 if (!JWT_SECRET) {
-    console.error("CRITICAL ERROR in authController: JWT_SECRET is not defined!");
-    // Em um cenário real, você poderia impedir o servidor de continuar se isso for crítico.
-    // Mas como server.js já faz process.exit(1), esta mensagem é mais para debug.
+    console.error("CRITICAL ERROR in authController: JWT_SECRET is not defined! This should have been caught in server.js.");
+    // Considerar um mecanismo de falha mais robusto se isso for alcançado.
 }
 
 exports.register = async (req, res) => {
@@ -28,9 +26,10 @@ exports.register = async (req, res) => {
         const newUser = await User.create({ name, email, password });
 
         const token = jwt.sign({ id: newUser.id, email: newUser.email }, JWT_SECRET, {
-            expiresIn: '1h',
+            expiresIn: '1h', // Token expira em 1 hora
         });
 
+        // Não retornar a senha, mesmo hasheada, na resposta padrão
         const userResponse = {
             id: newUser.id,
             name: newUser.name,
@@ -65,7 +64,7 @@ exports.login = async (req, res) => {
 
         const user = await User.findOne({ where: { email } });
         if (!user) {
-            // Mensagem genérica por segurança
+            // Mensagem genérica por segurança para não revelar se o email existe ou não
             return res.status(401).json({ message: 'Credenciais inválidas.' });
         }
 
@@ -76,7 +75,7 @@ exports.login = async (req, res) => {
         }
 
         const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
-            expiresIn: '1h',
+            expiresIn: '1h', // Token expira em 1 hora
         });
 
         const userResponse = {
@@ -98,24 +97,3 @@ exports.login = async (req, res) => {
         res.status(500).json({ message: 'Erro interno do servidor ao fazer login.', errorDetails: error.message });
     }
 };
-
-// (OPCIONAL - Endpoint /me para buscar dados do usuário logado)
-// Você precisaria de um middleware de autenticação para proteger esta rota
-// exports.getMe = async (req, res) => {
-//     // req.user deve ser populado pelo middleware de autenticação após verificar o token JWT
-//     if (!req.user || !req.user.id) {
-//         return res.status(401).json({ message: 'Não autorizado ou usuário não encontrado no token.' });
-//     }
-//     try {
-//         const user = await User.findByPk(req.user.id, {
-//             attributes: ['id', 'name', 'email', 'createdAt', 'updatedAt'] // Não retorne a senha
-//         });
-//         if (!user) {
-//             return res.status(404).json({ message: 'Usuário não encontrado.' });
-//         }
-//         res.status(200).json({ user });
-//     } catch (error) {
-//         console.error("Erro ao buscar dados do usuário (/me):", error);
-//         res.status(500).json({ message: 'Erro interno do servidor.', errorDetails: error.message });
-//     }
-// };
